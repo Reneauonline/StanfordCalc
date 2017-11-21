@@ -12,9 +12,13 @@ func changeSign(Operand: Double)-> Double{
     return -Operand
 }
 
+
+
 struct CalculatorBrain {
     
     private var accumulator: Double?
+    private var events :String = ""
+    private var resultIsPending :Bool = false
     
     private enum Operation{
         case constant (Double)
@@ -36,6 +40,7 @@ struct CalculatorBrain {
         "−": Operation.binaryOperation({$0 - $1}),
         "÷": Operation.binaryOperation({$0 / $1}),
         "=" : Operation.equals
+    
     ]
     
     private var pbo : PendingBinaryOperation?
@@ -54,6 +59,11 @@ struct CalculatorBrain {
                 if accumulator != nil{
                 pbo = PendingBinaryOperation(function: function, firstOperand: accumulator!)
                 accumulator = nil
+                    
+                    if symbol != "equals"{ events += symbol+" "
+                    }
+                    
+                    
                 }
             case .equals:
                 performPPendingBinaryOperation()
@@ -81,14 +91,18 @@ private struct PendingBinaryOperation {
     mutating func setOperand (_ operand: Double){
         
         accumulator = operand
- 
+        events=events + String(operand)
+        
     }
     
     
     
     var result: Double?  {
         get {
-           return accumulator
+            var RoundAccumulator :Double?  = nil
+            if accumulator != nil { RoundAccumulator = Double(round(10000 * accumulator!)/10000)}
+          //  return accumulator
+          return RoundAccumulator
         }
     }
     
